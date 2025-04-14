@@ -171,9 +171,9 @@
 
 <body>
   <div class="form-container">
-  
+
     <!-- Form 2 - Guardian -->
-    <form id="guardianForm" >
+    <form id="guardianForm">
       <label for="guardian-name">Guardian Name</label>
       <input type="text" id="guardian-name" required />
       <div class="error-message" id="guardian-name-error"></div>
@@ -207,6 +207,7 @@
           <div data-value="OTH">Other</div>
         </div>
       </div>
+      <div id="nominee-relation-error" class="error-message" style="color: red;"></div>
 
       <label for="guardian-address">Address</label>
       <input type="text" id="guardian-address" required />
@@ -229,14 +230,14 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
   <script>
-    //  flatpickr("#guardian-dob", {
+    // flatpickr("#guardian-dob", {
     //   dateFormat: "d/m/y",
     //   maxDate: "today",
     // });
     flatpickr("#guardian-dob", {
-  dateFormat: "d/m/Y",
-  maxDate: new Date(new Date().setFullYear(new Date().getFullYear() - 18)),
-});
+      dateFormat: "d/m/y",
+      maxDate: new Date(new Date().setFullYear(new Date().getFullYear() - 18)),
+    });
 
     // Guardian Dropdown Logic
     document.getElementById("dropdownButtonGuardian").addEventListener("click", function () {
@@ -265,7 +266,7 @@
     // Close dropdown if clicked outside
     document.addEventListener("click", function (event) {
       if (!event.target.closest(".dropdown")) {
-       
+
         document.getElementById("dropdownContentGuardian").style.display = "none";
         document.getElementById("arrowIconGuardian").classList.remove("rotate");
       }
@@ -294,21 +295,26 @@
       return address.trim().length >= 5;
     }
 
-  
+
     function validateGuardianForm() {
 
       $(".error-message").text("");
       const name = $("#guardian-name").val().trim();
       const dob = $("#guardian-dob").val().trim();
       const address = $("#guardian-address").val().trim();
+      const relation = $("#dropdownButtonGuardian span").attr("data-value");
 
       if (!isValidName(name)) {
         $("#guardian-name-error").text("Please enter guardian name.");
         return false;
       }
 
-      if (!dob.match(/^\d{2}\/\d{2}\/\d{2}$/)) {
-        $("#guardian-dob-error").text("Please enter dob.");
+      if (!/^\d{2}\/\d{2}\/\d{2}$/.test(dob)) {
+        $("#guardian-dob-error").text("Please enter a valid DOB.");
+        return false;
+      }
+      if (!relation) {
+        $("#nominee-relation-error").text("Please select a relation.");
         return false;
       }
 
@@ -320,9 +326,13 @@
       return true;
     }
 
-
+    $(".reset-btn").on("click", function () {
+      $("#dropdownButtonGuardian span").text("Select an option");
+      $("#dropdownButtonGuardian span").removeAttr("data-value");
+      $("#dropdownButtonGuardian").removeClass("selected");
+      $("#nominee-relation-error").text(""); // Also clear any error message
+    });
     function sendGuardianData() {
-
 
       const guardianName = $("#guardian-name").val();
       const guardianDob = $("#guardian-dob").val();
@@ -351,27 +361,9 @@
 
       window.parent.postMessage(JSON.stringify(message), "*");
 
-      $("#guardianForm").trigger("reset");
-      $("#dropdownButtonGuardian span").text("Select Relation");
-
       $("#successMessage").show();
     }
 
-    $("#check-age-btn").on("click", function () {
-      if (!validateNomineeForm()) return;
-      $(this).prop("disabled", true);
-
-      const dob = $("#nominee-dob").val();
-      const [day, month, year] = dob.split("/").map(Number);
-      const age = calculateExactAge(day, month, year);
-
-    //   if (age < 18) {
-    //     $("#nomineeForm").hide();
-    //     $("#guardianForm").show();
-    //   } else {
-    //     sendNomineeData();
-    //   }
-    });
 
     $("#submit-guardian").on("click", function () {
       if (!validateGuardianForm()) return;
