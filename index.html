@@ -230,12 +230,9 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
   <script>
-    // flatpickr("#guardian-dob", {
-    //   dateFormat: "d/m/y",
-    //   maxDate: "today",
-    // });
+
     flatpickr("#guardian-dob", {
-      dateFormat: "d/m/y",
+      dateFormat: "d-m-Y",
       maxDate: new Date(new Date().setFullYear(new Date().getFullYear() - 18)),
     });
 
@@ -309,10 +306,11 @@
         return false;
       }
 
-      if (!/^\d{2}\/\d{2}\/\d{2}$/.test(dob)) {
-        $("#guardian-dob-error").text("Please enter a valid DOB.");
+      if (!/^\d{2}-\d{2}-\d{4}$/.test(dob)) {
+        $("#guardian-dob-error").text("Please enter a valid DOB in dd-MM-yyyy format.");
         return false;
       }
+
       if (!relation) {
         $("#nominee-relation-error").text("Please select a relation.");
         return false;
@@ -347,7 +345,6 @@
         guardianAddress,
       };
       console.log("Guardian Data Sent to Server:", guardianData);
-
 
       const message = {
         event_code: "ym-client-event",
